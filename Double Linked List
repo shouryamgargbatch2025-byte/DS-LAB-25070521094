@@ -1,0 +1,151 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+struct Node {
+    int data;
+    struct Node* next;
+    struct Node* prev;
+};
+
+struct Node* head = NULL;
+
+void display() {
+    struct Node* temp = head;
+    if(temp == NULL) {
+        printf("List is empty\n");
+        return;
+    }
+    while(temp != NULL) {
+        printf("%d ", temp->data);
+        temp = temp->next;
+    }
+    printf("\n");
+}
+
+void insert(int x) {
+    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+    newNode->data = x;
+    newNode->next = NULL;
+    newNode->prev = NULL;
+
+    if(head == NULL) {
+        head = newNode;
+        return;
+    }
+
+    struct Node* temp = head;
+    while(temp->next != NULL)
+        temp = temp->next;
+
+    temp->next = newNode;
+    newNode->prev = temp;
+}
+
+void deleteNode(int x) {
+    struct Node* temp = head;
+
+    while(temp != NULL && temp->data != x)
+        temp = temp->next;
+
+    if(temp == NULL) {
+        printf("Not found\n");
+        return;
+    }
+
+    if(temp == head)
+        head = temp->next;
+
+    if(temp->next != NULL)
+        temp->next->prev = temp->prev;
+
+    if(temp->prev != NULL)
+        temp->prev->next = temp->next;
+
+    free(temp);
+}
+
+void reverse() {
+    struct Node* temp = NULL;
+    struct Node* curr = head;
+
+    while(curr != NULL) {
+        temp = curr->prev;
+        curr->prev = curr->next;
+        curr->next = temp;
+        curr = curr->prev;
+    }
+
+    if(temp != NULL)
+        head = temp->prev;
+}
+
+void concatenate() {
+    int n, x;
+    scanf("%d", &n);
+
+    struct Node* head2 = NULL;
+    struct Node* last = NULL;
+
+    for(int i = 0; i < n; i++) {
+        scanf("%d", &x);
+
+        struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+        newNode->data = x;
+        newNode->next = NULL;
+        newNode->prev = NULL;
+
+        if(head2 == NULL) {
+            head2 = last = newNode;
+        } else {
+            last->next = newNode;
+            newNode->prev = last;
+            last = newNode;
+        }
+    }
+
+    if(head == NULL) {
+        head = head2;
+        return;
+    }
+
+    struct Node* temp = head;
+    while(temp->next != NULL)
+        temp = temp->next;
+
+    temp->next = head2;
+    if(head2 != NULL)
+        head2->prev = temp;
+}
+
+int main() {
+    int ch, x;
+
+    while(1) {
+        printf("1.Insert 2.Delete 3.Display 4.Reverse 5.Concat 6.Exit\n");
+        scanf("%d", &ch);
+
+        switch(ch) {
+            case 1:
+                scanf("%d", &x);
+                insert(x);
+                break;
+            case 2:
+                scanf("%d", &x);
+                deleteNode(x);
+                break;
+            case 3:
+                display();
+                break;
+            case 4:
+                reverse();
+                display();
+                break;
+            case 5:
+                concatenate();
+                display();
+                break;
+            case 6:
+                exit(0);
+        }
+    }
+}
