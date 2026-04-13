@@ -1,0 +1,194 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+struct node {
+    int data;
+    struct node *next;
+};
+
+typedef struct node* NODE;
+
+NODE createNode(int data) {
+    NODE temp = (NODE)malloc(sizeof(struct node));
+    temp->data = data;
+    temp->next = NULL;
+    return temp;
+}
+
+NODE createCLL(int n) {
+    NODE first = NULL, last = NULL;
+    int x;
+
+    for(int i = 0; i < n; i++) {
+        scanf("%d", &x);
+        NODE newnode = createNode(x);
+
+        if(first == NULL) {
+            first = last = newnode;
+        } else {
+            last->next = newnode;
+            last = newnode;
+        }
+    }
+
+    if(last != NULL)
+        last->next = first;
+
+    return first;
+}
+
+void display(NODE first) {
+    if(first == NULL) return;
+
+    NODE temp = first;
+    do {
+        printf("%d -> ", temp->data);
+        temp = temp->next;
+    } while(temp != first);
+    printf("\n");
+}
+
+NODE insert(NODE first, int pos, int x) {
+    NODE newnode = createNode(x);
+
+    if(pos == 1) {
+        if(first == NULL) {
+            newnode->next = newnode;
+            return newnode;
+        }
+
+        NODE temp = first;
+        while(temp->next != first)
+            temp = temp->next;
+
+        newnode->next = first;
+        temp->next = newnode;
+        return newnode;
+    }
+
+    NODE temp = first;
+    for(int i = 1; i < pos-1 && temp->next != first; i++)
+        temp = temp->next;
+
+    newnode->next = temp->next;
+    temp->next = newnode;
+
+    return first;
+}
+
+NODE deleteNode(NODE first, int pos) {
+    if(first == NULL) return first;
+
+    if(pos == 1) {
+        if(first->next == first) {
+            free(first);
+            return NULL;
+        }
+
+        NODE last = first;
+        while(last->next != first)
+            last = last->next;
+
+        NODE temp = first;
+        first = first->next;
+        last->next = first;
+        free(temp);
+        return first;
+    }
+
+    NODE temp = first, prev;
+    for(int i = 1; i < pos && temp->next != first; i++) {
+        prev = temp;
+        temp = temp->next;
+    }
+
+    prev->next = temp->next;
+    free(temp);
+
+    return first;
+}
+
+NODE reverse(NODE first) {
+    if(first == NULL || first->next == first)
+        return first;
+
+    NODE prev = NULL, curr = first, next;
+    NODE last = first;
+
+    while(last->next != first)
+        last = last->next;
+
+    do {
+        next = curr->next;
+        curr->next = prev;
+        prev = curr;
+        curr = next;
+    } while(curr != first);
+
+    first->next = prev;
+    return prev;
+}
+
+NODE concat(NODE first, NODE second) {
+    if(first == NULL) return second;
+    if(second == NULL) return first;
+
+    NODE t1 = first, t2 = second;
+
+    while(t1->next != first)
+        t1 = t1->next;
+
+    while(t2->next != second)
+        t2 = t2->next;
+
+    t1->next = second;
+    t2->next = first;
+
+    return first;
+}
+
+int main() {
+    NODE first = NULL, second = NULL;
+    int n, x, pos, op;
+
+    while(1) {
+        printf("1.Create 2.Insert 3.Delete 4.Display 5.Reverse 6.Concat 7.Exit\n");
+        scanf("%d", &op);
+
+        switch(op) {
+            case 1:
+                scanf("%d", &n);
+                first = createCLL(n);
+                break;
+
+            case 2:
+                scanf("%d%d", &pos, &x);
+                first = insert(first, pos, x);
+                break;
+
+            case 3:
+                scanf("%d", &pos);
+                first = deleteNode(first, pos);
+                break;
+
+            case 4:
+                display(first);
+                break;
+
+            case 5:
+                first = reverse(first);
+                display(first);
+                break;
+
+            case 6:
+                scanf("%d", &n);
+                second = createCLL(n);
+                first = concat(first, second);
+                display(first);
+                break;
+
+            case 7:
+                exit(0);
+        }
+    }
+}
